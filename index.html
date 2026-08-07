@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<!-- iPad: 확대/축소 방지 + 노치·홈 인디케이터 영역 대응 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<!-- 홈 화면에 추가했을 때 사파리 주소창 없이 전체화면으로 실행 -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="등교 확인" />
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
+<meta name="theme-color" content="#EDF4FF" />
+<title>아침 등교 확인</title>
+<style>
+  /* ============================================================
+     색상 · 타이포 토큰
+     ============================================================ */
+  :root {
+    --bg-top: #EDF4FF;
+    --bg-bottom: #F3FBF4;
+    --card: #FFFFFF;
+    --ink: #1D2A36;
+    --ink-soft: #5A6B7B;
+    --line: #DDE6EF;
+
+    --ok-deep: #1E7A55;
+    --ok-mid: #38B37E;
+    --ok-soft: #DFF5EA;
+
+    --late-deep: #C1491A;
+    --late-mid: #F0803C;
+    --late-soft: #FDEBDF;
+
+    --btn: #2F6FD0;
+    --btn-press: #24589F;
+
+    --radius-l: 28px;
+    --radius-m: 18px;
+    --shadow: 0 6px 18px rgba(29, 42, 54, .08);
+
+    /* iPad 기본 한글 서체를 우선 사용 (인터넷 연결 없이 동작) */
+    --font: -apple-system, "Apple SD Gothic Neo", "Pretendard",
+            "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    background-attachment: fixed;
+    font-family: var(--font);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+    /* iPad: 글자 길게 눌러 복사/확대 메뉴가 뜨지 않도록 */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    /* 화면 끝에서 튕기는 스크롤(고무줄 효과) 억제 */
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+
+  .wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    /* 홈 인디케이터·상태바 영역 확보 */
+    padding: calc(20px + env(safe-area-inset-top)) 18px
+             calc(96px + env(safe-area-inset-bottom)) 18px;
+  }
+
+  /* ============================================================
+     1. 디지털 시계
+     ============================================================ */
+  .clock-box { text-align: center; padding: 6px 0 4px; }
+
+  .today {
+    font-size: clamp(1.1rem, 3.4vw, 1.5rem);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .clock {
+    margin: 2px 0 0;
+    font-size: clamp(3.6rem, 15vw, 7rem);
+    font-weight: 900;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    color: var(--ink);
+  }
+
+  .standard-note {
+    margin-top: 2px;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .standard-note b { color: var(--btn); }
+
+  /* ============================================================
+     2. 등교 확인 버튼
+     ============================================================ */
+  .check-btn {
+    display: block;
+    width: 100%;
+    margin: 20px 0 0;
+    padding: 32px 16px;
+    border: none;
+    border-radius: var(--radius-l);
+    background: var(--btn);
+    color: #fff;
+    font-family: inherit;
+    font-size: clamp(2rem, 7.5vw, 3rem);
+    font-weight: 900;
+    letter-spacing: .04em;
+    box-shadow: 0 8px 0 var(--btn-press), var(--shadow);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .check-btn.pressing {
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 var(--btn-press);
+  }
+  .check-btn:focus-visible { outline: 5px solid #143C77; outline-offset: 4px; }
+  .check-btn[disabled] {
+    background: #B8C6D6;
+    box-shadow: 0 8px 0 #9DAFC2;
+    cursor: default;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  /* ============================================================
+     3. 도장(스탬프)
+     ============================================================ */
+  .stamp-area {
+    margin-top: 22px;
+    background: var(--card);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow);
+    padding: 26px 18px;
+    text-align: center;
+    min-height: 290px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stamp {
+    width: clamp(170px, 44vw, 220px);
+    height: clamp(170px, 44vw, 220px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(5.5rem, 24vw, 7.5rem);
+    line-height: 1;
+  }
+  .stamp.empty {
+    border: 6px dashed var(--line);
+    color: #B9C6D3;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    font-weight: 800;
+    background: #FBFDFF;
+  }
+  .stamp.ok {
+    background: var(--ok-soft);
+    border: 10px solid var(--ok-mid);
+    box-shadow: inset 0 0 0 6px #fff;
+  }
+  .stamp.late {
+    background: var(--late-soft);
+    border: 10px solid var(--late-mid);
+    box-shadow: inset 0 0 0 6px #fff;
+  }
+
+  .stamp-msg {
+    margin-top: 18px;
+    font-size: clamp(1.5rem, 5.5vw, 2.2rem);
+    font-weight: 900;
+    line-height: 1.35;
+  }
+  .stamp-msg.ok { color: var(--ok-deep); }
+  .stamp-msg.late { color: var(--late-deep); }
+  .stamp-msg.empty { color: var(--ink-soft); font-weight: 800; }
+
+  @keyframes stampDrop {
+    0%   { transform: scale(2.7) rotate(-14deg); opacity: 0; }
+    50%  { transform: scale(.86) rotate(-5deg);  opacity: 1; }
+    68%  { transform: scale(1.10) rotate(2deg); }
+    84%  { transform: scale(.97) rotate(0deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes areaShake {
+    0%, 100% { transform: translateY(0); }
+    52%      { transform: translateY(6px); }
+    70%      { transform: translateY(-3px); }
+  }
+  .stamp.drop { animation: stampDrop .62s cubic-bezier(.22,.9,.3,1.1) both; }
+  .stamp-area.shake { animation: areaShake .62s ease both; }
+
+  /* ============================================================
+     4. 리포트
+     ============================================================ */
+  .card {
+    margin-top: 18px;
+    background: var(--card);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow);
+    padding: 20px 20px 22px;
+  }
+
+  .feedback {
+    margin-top: 18px;
+    background: #FFF8E1;
+    border: 3px solid #F5D97A;
+    border-radius: var(--radius-l);
+    padding: 18px 16px;
+    text-align: center;
+    font-size: clamp(1.25rem, 4.6vw, 1.7rem);
+    font-weight: 900;
+    color: #8A6100;
+    line-height: 1.4;
+  }
+
+  .card-title {
+    margin: 0 0 14px;
+    font-size: clamp(1.15rem, 4vw, 1.4rem);
+    font-weight: 900;
+  }
+  .card-title span { color: var(--ink-soft); font-weight: 700; font-size: .82em; }
+
+  .week { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .day {
+    background: #F7FAFD;
+    border: 2px solid var(--line);
+    border-radius: var(--radius-m);
+    padding: 12px 4px 10px;
+    text-align: center;
+  }
+  .day.is-today { border-color: var(--btn); background: #EEF4FF; }
+  .day-name { font-size: clamp(.95rem, 3vw, 1.1rem); font-weight: 800; color: var(--ink-soft); }
+  .day-face { font-size: clamp(1.9rem, 7vw, 2.5rem); line-height: 1.25; }
+  .day-face.none { color: #C9D5E1; font-size: clamp(1.4rem, 5vw, 1.8rem); }
+  .day-time {
+    font-size: clamp(.78rem, 2.6vw, .95rem);
+    font-weight: 700; color: var(--ink-soft);
+    font-variant-numeric: tabular-nums; min-height: 1.2em;
+  }
+
+  .month-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .num-box { border-radius: var(--radius-m); padding: 14px 8px 12px; text-align: center; }
+  .num-box.ok { background: var(--ok-soft); }
+  .num-box.late { background: var(--late-soft); }
+  .num-label { font-size: clamp(1rem, 3.2vw, 1.15rem); font-weight: 800; }
+  .num-box.ok .num-label { color: var(--ok-deep); }
+  .num-box.late .num-label { color: var(--late-deep); }
+  .num-value {
+    font-size: clamp(2.6rem, 10vw, 3.6rem);
+    font-weight: 900; line-height: 1.05; font-variant-numeric: tabular-nums;
+  }
+  .num-box.ok .num-value { color: var(--ok-deep); }
+  .num-box.late .num-value { color: var(--late-deep); }
+  .num-unit { font-size: .45em; font-weight: 800; margin-left: 2px; }
+
+  .bar-row { margin-top: 10px; }
+  .bar-head {
+    display: flex; justify-content: space-between;
+    font-size: clamp(.95rem, 3vw, 1.05rem);
+    font-weight: 800; color: var(--ink-soft); margin-bottom: 5px;
+  }
+  .bar-track { height: 26px; background: #EEF3F8; border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; width: 0; transition: width .7s cubic-bezier(.25,.9,.3,1); }
+  .bar-fill.ok { background: var(--ok-mid); }
+  .bar-fill.late { background: var(--late-mid); }
+
+  .empty-note {
+    text-align: center; color: var(--ink-soft); font-weight: 700;
+    font-size: clamp(1rem, 3.2vw, 1.1rem); padding: 6px 0 2px;
+  }
+
+  /* ============================================================
+     iPad 가로 모드: 2단 구성 (스크롤 없이 한 화면)
+     ============================================================ */
+  @media (orientation: landscape) and (min-width: 900px) {
+    .wrap {
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 22px;
+      align-items: start;
+      padding: calc(16px + env(safe-area-inset-top)) 28px
+               calc(72px + env(safe-area-inset-bottom)) 28px;
+    }
+    .col { min-width: 0; }
+    .clock { font-size: 5rem; }
+    .today { font-size: 1.35rem; }
+    .standard-note { font-size: 1.15rem; }
+    .check-btn { font-size: 2.6rem; padding: 26px 16px; margin-top: 14px; }
+    .check-btn[disabled] { font-size: 1.9rem; }
+    .stamp-area { margin-top: 16px; min-height: 0; padding: 20px 16px; }
+    .stamp { width: 186px; height: 186px; font-size: 6rem; }
+    .stamp.empty { font-size: 1.3rem; }
+    .stamp-msg { font-size: 1.85rem; margin-top: 14px; }
+    .feedback { margin-top: 0; font-size: 1.5rem; }
+    .card { margin-top: 16px; }
+    .day-face { font-size: 2.2rem; }
+    .num-value { font-size: 3.2rem; }
+  }
+
+  /* ============================================================
+     5. 교사용 영역
+     ============================================================ */
+  .teacher {
+    position: fixed;
+    right: calc(12px + env(safe-area-inset-right));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    display: flex; gap: 6px; align-items: center; z-index: 30;
+  }
+  .teacher button {
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    color: #7C8894; background: rgba(246, 248, 250, .9);
+    border: 1px solid #D5DCE3; border-radius: 8px;
+    padding: 8px 11px; cursor: pointer; opacity: .5;
+    -webkit-appearance: none; appearance: none;
+    touch-action: manipulation;
+  }
+  .teacher button:active { opacity: 1; background: #ECEFF3; }
+  .teacher button:focus-visible { outline: 2px solid #7C8894; outline-offset: 2px; }
+
+  /* CSV 대체 저장 창 */
+  .modal {
+    position: fixed; inset: 0; z-index: 40;
+    background: rgba(20, 28, 36, .45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .modal[hidden] { display: none; }
+  .modal-box {
+    background: #fff; border-radius: 20px; padding: 22px;
+    width: min(660px, 100%); max-height: 82vh; overflow: auto;
+    box-shadow: 0 18px 50px rgba(20, 28, 36, .3);
+  }
+  .modal-box h3 { margin: 0 0 6px; font-size: 1.2rem; }
+  .modal-box p { margin: 0 0 12px; font-size: .95rem; color: var(--ink-soft); line-height: 1.5; }
+  .modal-box textarea {
+    width: 100%; height: 220px; font-family: ui-monospace, Menlo, monospace;
+    font-size: 13px; line-height: 1.5; padding: 10px;
+    border: 1px solid var(--line); border-radius: 12px; resize: vertical;
+    -webkit-user-select: text; user-select: text;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+  .modal-actions button {
+    font-family: inherit; font-size: .95rem; font-weight: 700;
+    padding: 11px 18px; border-radius: 12px; border: 1px solid var(--line);
+    background: #F4F7FA; color: var(--ink); cursor: pointer;
+    -webkit-appearance: none; appearance: none;
+  }
+  .modal-actions button.primary { background: var(--btn); border-color: var(--btn); color: #fff; }
+
+  .toast {
+    position: fixed; left: 50%;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(12px);
+    background: rgba(29, 42, 54, .92); color: #fff;
+    font-size: 14px; font-weight: 700; padding: 11px 18px;
+    border-radius: 999px; opacity: 0; pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease; z-index: 50;
+    max-width: 80vw; text-align: center; line-height: 1.4;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stamp.drop, .stamp-area.shake { animation: none; }
+    .bar-fill { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="col">
+    <!-- 1. 디지털 시계 -->
+    <div class="clock-box">
+      <div class="today" id="todayText">—</div>
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="standard-note">등교 시간 <b id="standardText">08:30</b>까지</div>
+    </div>
+
+    <!-- 2. 등교 확인 버튼 -->
+    <button class="check-btn" id="checkBtn" type="button">등교 확인</button>
+
+    <!-- 3. 도장 -->
+    <div class="stamp-area" id="stampArea" aria-live="polite">
+      <div class="stamp empty" id="stamp">오늘의 도장</div>
+      <div class="stamp-msg empty" id="stampMsg">등교 확인 버튼을 눌러요</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <!-- 4-1. 자동 피드백 -->
+    <div class="feedback" id="feedback">오늘도 반가워요!</div>
+
+    <!-- 4-2. 주별 리포트 -->
+    <section class="card">
+      <h2 class="card-title">이번 주 등교 <span id="weekRange"></span></h2>
+      <div class="week" id="weekGrid"></div>
+    </section>
+
+    <!-- 4-3. 월별 현황 -->
+    <section class="card">
+      <h2 class="card-title">이번 달 기록 <span id="monthLabel"></span></h2>
+      <div class="month-nums">
+        <div class="num-box ok">
+          <div class="num-label">😊 제시간</div>
+          <div class="num-value"><span id="monthOk">0</span><span class="num-unit">일</span></div>
+        </div>
+        <div class="num-box late">
+          <div class="num-label">😢 지각</div>
+          <div class="num-value"><span id="monthLate">0</span><span class="num-unit">일</span></div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-head"><span>제시간</span><span id="okPctText">0%</span></div>
+        <div class="bar-track"><div class="bar-fill ok" id="okBar"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-head"><span>지각</span><span id="latePctText">0%</span></div>
+        <div class="bar-track"><div class="bar-fill late" id="lateBar"></div></div>
+      </div>
+      <div class="empty-note" id="monthEmpty" hidden>아직 기록이 없어요.</div>
+    </section>
+  </div>
+
+</div>
+
+<!-- 5. 교사용 -->
+<div class="teacher">
+  <button type="button" id="csvBtn">교사용 데이터 저장(CSV)</button>
+  <button type="button" id="resetBtn">초기화</button>
+</div>
+
+<!-- CSV 대체 저장 창 (파일 저장이 막힐 때) -->
+<div class="modal" id="csvModal" hidden>
+  <div class="modal-box">
+    <h3>등교 기록 데이터</h3>
+    <p>파일 저장이 지원되지 않는 환경입니다. 아래 내용을 복사해 메모·메일·엑셀에 붙여넣으면 그대로 표로 정리됩니다.</p>
+    <textarea id="csvText" readonly></textarea>
+    <div class="modal-actions">
+      <button type="button" id="copyBtn" class="primary">전체 복사</button>
+      <button type="button" id="closeModal">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   [설정] 기준 등교 시간
+   ------------------------------------------------------------
+   아래 세 값만 바꾸면 판정 기준이 전체에 반영됩니다.
+   기본값 08:30:00 → 08:30:00까지 '제시간', 08:30:01부터 '지각'
+   ============================================================ */
+const STANDARD_HOUR   = 8;   // 기준 시(0~23)
+const STANDARD_MINUTE = 30;  // 기준 분
+const STANDARD_SECOND = 0;   // 기준 초
+
+const STORAGE_KEY = "arrival_records_v1";
+
+/* ---------- 공통 유틸 ---------- */
+const $ = (id) => document.getElementById(id);
+const pad2 = (n) => String(n).padStart(2, "0");
+const DAY_KO = ["일", "월", "화", "수", "목", "금", "토"];
+
+function dateKey(d) {
+  return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+}
+function timeText(d) {
+  return pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
+}
+function toHHMM(t) { return String(t).slice(0, 5); }
+
+function isLate(d) {
+  const nowSec = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+  const stdSec = STANDARD_HOUR * 3600 + STANDARD_MINUTE * 60 + STANDARD_SECOND;
+  return nowSec > stdSec;
+}
+
+/* ---------- 저장소 ----------
+   iPad 사파리에서 저장이 막히는 경우(사생활 보호 모드 등)를 대비해
+   메모리 사본을 함께 유지합니다. 이 경우 앱을 닫으면 기록이 사라지므로
+   화면에 안내를 띄웁니다. */
+let memoryFallback = null;
+
+function loadRecords() {
+  if (memoryFallback) return memoryFallback.slice();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveRecords(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    memoryFallback = null;
+    return true;
+  } catch (e) {
+    memoryFallback = list.slice();   // 저장 실패 시 화면 유지용 사본
+    return false;
+  }
+}
+function findRecord(key) {
+  return loadRecords().find((r) => r.date === key) || null;
+}
+
+/* ---------- 1. 시계 ---------- */
+let shownDateKey = "";
+let shownClock = "";
+
+function tick() {
+  const now = new Date();
+
+  const t = timeText(now);
+  if (t !== shownClock) {          // 실제로 바뀔 때만 화면 갱신
+    shownClock = t;
+    $("clock").textContent = t;
+  }
+
+  $("todayText").textContent =
+    (now.getMonth() + 1) + "월 " + now.getDate() + "일 " + DAY_KO[now.getDay()] + "요일";
+
+  const key = dateKey(now);
+  if (key !== shownDateKey) {      // 자정을 넘기면 새 날짜로 자동 전환
+    shownDateKey = key;
+    renderAll(false);
+  }
+}
+
+/* ---------- 2. 등교 확인 ---------- */
+function handleCheckIn() {
+  const now = new Date();
+  const key = dateKey(now);
+
+  const already = findRecord(key);
+  if (already) {                   // 하루 1회만 기록
+    renderStamp(already, false);
+    return;
+  }
+
+  const list = loadRecords();
+  list.push({ date: key, time: timeText(now), late: isLate(now) });
+  list.sort((a, b) => (a.date < b.date ? -1 : 1));
+
+  const saved = saveRecords(list);
+  renderAll(true);
+
+  if (!saved) {
+    showToast("기록이 이 기기에 저장되지 않았습니다. 사생활 보호 모드를 해제해 주세요.");
+  }
+}
+
+/* ---------- 3. 도장 ---------- */
+function renderStamp(record, animate) {
+  const stamp = $("stamp"), msg = $("stampMsg"), area = $("stampArea");
+
+  stamp.className = "stamp";
+  msg.className = "stamp-msg";
+
+  if (!record) {
+    stamp.classList.add("empty");
+    stamp.textContent = "오늘의 도장";
+    msg.classList.add("empty");
+    msg.textContent = "등교 확인 버튼을 눌러요";
+    return;
+  }
+
+  if (record.late) {
+    stamp.classList.add("late");
+    stamp.textContent = "😢";
+    msg.classList.add("late");
+    msg.textContent = toHHMM(record.time) + " 도착! 내일은 일찍 와요";
+  } else {
+    stamp.classList.add("ok");
+    stamp.textContent = "😊";
+    msg.classList.add("ok");
+    msg.textContent = toHHMM(record.time) + " 도착! 참 잘했어요";
+  }
+
+  if (animate) {
+    stamp.classList.remove("drop");
+    area.classList.remove("shake");
+    void stamp.offsetWidth;
+    stamp.classList.add("drop");
+    area.classList.add("shake");
+  }
+}
+
+/* ---------- 4-1. 주별 리포트 (월~금) ---------- */
+function getMonday(d) {
+  const base = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  base.setDate(base.getDate() - ((base.getDay() + 6) % 7));
+  return base;
+}
+
+function renderWeek() {
+  const now = new Date();
+  const monday = getMonday(now);
+  const todayK = dateKey(now);
+  const grid = $("weekGrid");
+  grid.innerHTML = "";
+
+  let ok = 0, late = 0;
+
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    const rec = findRecord(dateKey(d));
+
+    const cell = document.createElement("div");
+    cell.className = "day" + (dateKey(d) === todayK ? " is-today" : "");
+
+    const name = document.createElement("div");
+    name.className = "day-name";
+    name.textContent = DAY_KO[d.getDay()];
+
+    const face = document.createElement("div");
+    face.className = "day-face" + (rec ? "" : " none");
+    face.textContent = rec ? (rec.late ? "😢" : "😊") : "·";
+
+    const time = document.createElement("div");
+    time.className = "day-time";
+    time.textContent = rec ? toHHMM(rec.time) : "";
+
+    cell.append(name, face, time);
+    grid.appendChild(cell);
+
+    if (rec) { rec.late ? late++ : ok++; }
+  }
+
+  const end = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 4);
+  $("weekRange").textContent =
+    "(" + (monday.getMonth() + 1) + "/" + monday.getDate() +
+    " ~ " + (end.getMonth() + 1) + "/" + end.getDate() + ")";
+
+  return { ok, late };
+}
+
+/* ---------- 4-2. 월별 현황 ---------- */
+function renderMonth() {
+  const now = new Date();
+  const prefix = now.getFullYear() + "-" + pad2(now.getMonth() + 1);
+  const list = loadRecords().filter((r) => String(r.date).startsWith(prefix));
+
+  const ok = list.filter((r) => !r.late).length;
+  const late = list.filter((r) => r.late).length;
+  const total = ok + late;
+
+  $("monthLabel").textContent = "(" + (now.getMonth() + 1) + "월 · 총 " + total + "일)";
+  $("monthOk").textContent = ok;
+  $("monthLate").textContent = late;
+
+  const okPct = total ? Math.round((ok / total) * 100) : 0;
+  $("okBar").style.width = okPct + "%";
+  $("lateBar").style.width = (total ? 100 - okPct : 0) + "%";
+  $("okPctText").textContent = okPct + "%";
+  $("latePctText").textContent = (total ? 100 - okPct : 0) + "%";
+  $("monthEmpty").hidden = total > 0;
+
+  return { ok, late, total };
+}
+
+/* ---------- 4-3. 자동 피드백 ---------- */
+function renderFeedback(week, month, todayRec) {
+  let text;
+  if (month.total === 0)                      text = "등교 확인 버튼을 눌러 오늘을 기록해 볼까요?";
+  else if (week.ok === 0 && week.late === 0)  text = "이번 주 첫 등교예요. 오늘도 힘내요!";
+  else if (week.ok >= 5)                      text = "이번 주 5일 모두 일찍 왔어요! 최고예요!";
+  else if (week.ok >= 3)                      text = "이번 주 " + week.ok + "일 일찍 왔어요! 대단해요!";
+  else if (week.ok > 0)                       text = "이번 주 " + week.ok + "일 일찍 왔어요. 조금씩 늘려 봐요!";
+  else if (todayRec && todayRec.late)         text = "와 줘서 고마워요. 내일은 조금만 더 일찍 와요!";
+  else                                        text = "내일은 일찍 오기에 도전해 볼까요?";
+  $("feedback").textContent = text;
+}
+
+/* ---------- 전체 렌더 ---------- */
+function renderAll(animate) {
+  const todayRec = findRecord(dateKey(new Date()));
+  renderStamp(todayRec, animate);
+
+  const btn = $("checkBtn");
+  btn.disabled = !!todayRec;
+  btn.textContent = todayRec ? "오늘 등교 확인 완료" : "등교 확인";
+
+  const week = renderWeek();
+  const month = renderMonth();
+  renderFeedback(week, month, todayRec);
+}
+
+/* ---------- 5. 교사용 CSV 저장 ----------
+   iPad 사파리는 <a download> 가 동작하지 않는 경우가 있어
+   ① 공유 시트(파일에 저장) → ② 직접 다운로드 → ③ 복사용 창
+   순서로 시도합니다. */
+function buildCSV() {
+  const list = loadRecords().slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+  const std = pad2(STANDARD_HOUR) + ":" + pad2(STANDARD_MINUTE) + ":" + pad2(STANDARD_SECOND);
+
+  const rows = [["날짜", "요일", "도착시각", "지각여부", "기준시간"]];
+  list.forEach((r) => {
+    const p = String(r.date).split("-");
+    const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    rows.push([r.date, DAY_KO[d.getDay()], r.time, r.late ? "지각" : "제시간", std]);
+  });
+
+  return {
+    count: list.length,
+    text: rows
+      .map((row) => row.map((c) => '"' + String(c).replace(/"/g, '""') + '"').join(","))
+      .join("\r\n")
+  };
+}
+
+async function saveCSV() {
+  const csv = buildCSV();
+  if (csv.count === 0) { showToast("저장된 기록이 없습니다."); return; }
+
+  // 엑셀에서 한글이 깨지지 않도록 BOM 추가
+  const content = "\uFEFF" + csv.text;
+  const filename = "student_arrival_data_" + dateKey(new Date()) + ".csv";
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+
+  // ① iPadOS 공유 시트 → '파일에 저장' / 메일 첨부
+  try {
+    const file = new File([blob], filename, { type: "text/csv" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "등교 기록" });
+      return;
+    }
+  } catch (e) {
+    if (e && e.name === "AbortError") return;   // 사용자가 공유를 취소한 경우
+  }
+
+  // ② 일반 다운로드
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    if ("download" in a) {
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      showToast("CSV 파일을 저장했습니다. (" + csv.count + "일치)");
+      return;
+    }
+    URL.revokeObjectURL(url);
+  } catch (e) { /* ③으로 진행 */ }
+
+  // ③ 복사용 창
+  $("csvText").value = csv.text;
+  $("csvModal").hidden = false;
+}
+
+async function copyCSV() {
+  const ta = $("csvText");
+  try {
+    await navigator.clipboard.writeText(ta.value);
+    showToast("복사했습니다.");
+  } catch (e) {
+    ta.focus();
+    ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand && document.execCommand("copy");
+    showToast(ok ? "복사했습니다." : "직접 길게 눌러 복사해 주세요.");
+  }
+}
+
+/* ---------- 초기화 (2단계 확인) ---------- */
+function resetAll() {
+  if (!confirm("저장된 모든 등교 기록을 삭제합니다. 계속할까요?")) return;
+  if (!confirm("삭제한 기록은 되돌릴 수 없습니다. 정말 삭제할까요?")) return;
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  memoryFallback = null;
+  renderAll(false);
+  showToast("기록을 모두 삭제했습니다.");
+}
+
+/* ---------- 안내 토스트 ---------- */
+let toastTimer = null;
+function showToast(text) {
+  const t = $("toast");
+  t.textContent = text;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* ---------- iPad 터치 대응 ---------- */
+const checkBtn = $("checkBtn");
+// iOS에서 :active 가 늦게 반응하는 문제를 보완해 누르는 느낌을 즉시 전달
+checkBtn.addEventListener("touchstart", () => checkBtn.classList.add("pressing"), { passive: true });
+["touchend", "touchcancel", "mouseup", "mouseleave"].forEach((ev) =>
+  checkBtn.addEventListener(ev, () => checkBtn.classList.remove("pressing"))
+);
+checkBtn.addEventListener("mousedown", () => checkBtn.classList.add("pressing"));
+
+// 홈 화면 실행 시 두 손가락 확대 방지
+["gesturestart", "gesturechange", "gestureend"].forEach((ev) =>
+  document.addEventListener(ev, (e) => e.preventDefault())
+);
+// 더블탭 확대 방지
+let lastTouch = 0;
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouch < 320) e.preventDefault();
+  lastTouch = now;
+}, { passive: false });
+
+/* ---------- 시작 ---------- */
+$("standardText").textContent = pad2(STANDARD_HOUR) + ":" + pad2(STANDARD_MINUTE);
+checkBtn.addEventListener("click", handleCheckIn);
+$("csvBtn").addEventListener("click", saveCSV);
+$("resetBtn").addEventListener("click", resetAll);
+$("copyBtn").addEventListener("click", copyCSV);
+$("closeModal").addEventListener("click", () => { $("csvModal").hidden = true; });
+
+// 화면을 껐다 켜거나 앱을 다시 열었을 때 시계·기록을 즉시 최신화
+document.addEventListener("visibilitychange", () => { if (!document.hidden) { tick(); renderAll(false); } });
+window.addEventListener("pageshow", () => { tick(); renderAll(false); });
+
+tick();
+setInterval(tick, 250);   // 초 단위 표시가 밀리지 않도록 짧은 주기로 확인
+renderAll(false);
+</script>
+</body>
+</html>
