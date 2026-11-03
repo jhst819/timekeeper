@@ -95,188 +95,185 @@
     }
   </style>
 </head>
-<body class="p-3 sm:p-5 lg:p-6 flex flex-col min-h-screen justify-between">
+<body class="p-2 sm:p-3 flex flex-col md:h-dvh md:max-h-dvh md:overflow-hidden justify-between select-none">
 
-  <!-- 상단 헤더 & 교사 전용 관리 바 -->
-  <header class="max-w-[1440px] w-full mx-auto mb-4 flex flex-wrap items-center justify-between gap-3 bg-white/90 border-2 border-amber-100 rounded-2xl px-4 py-3 shadow-sm">
-    <div class="flex items-center gap-3">
-      <div id="headerCatIcon" class="w-11 h-11 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center p-1 overflow-hidden"></div>
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="font-cute text-xl sm:text-2xl text-slate-800 tracking-tight">냥이 등교 습관 매니저</h1>
-          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">자기주도 등교 기록장</span>
-        </div>
-        <p class="text-xs sm:text-sm text-slate-500">매일 아침 스스로 등교 확인 버튼을 누르고 웃는 고양이 스탬프를 모아 보세요!</p>
+  <!-- 상단 헤더 & 교사 전용 관리 바 (컴팩트 1줄 구성) -->
+  <header class="max-w-[1440px] w-full mx-auto mb-2 shrink-0 flex flex-wrap items-center justify-between gap-2 bg-white/90 border-2 border-amber-100 rounded-2xl px-3.5 py-2 shadow-xs">
+    <div class="flex items-center gap-2.5">
+      <div id="headerCatIcon" class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center p-1 overflow-hidden shrink-0"></div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1 class="font-cute text-lg sm:text-xl text-slate-800 tracking-tight">냥이 등교 습관 매니저</h1>
+        <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">자기주도 등교 기록장</span>
       </div>
     </div>
 
     <!-- 우측 상단 교사 전용 도구 및 상태 표시 -->
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-1.5">
       <!-- 교사 모드 활성화 배지 -->
-      <div id="teacherModeBadge" class="hidden items-center gap-2 bg-violet-100 border-2 border-violet-300 text-violet-900 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold shadow-sm">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-violet-600 animate-ping"></span>
-        <span>교사 수동수정 모드 ON (요일·달력 클릭)</span>
-        <button id="exitTeacherModeBtn" type="button" class="ml-1 px-2 py-0.5 bg-violet-700 text-white rounded-lg hover:bg-violet-800 text-xs transition">
+      <div id="teacherModeBadge" class="hidden items-center gap-1.5 bg-violet-100 border-2 border-violet-300 text-violet-900 px-2.5 py-1 rounded-xl text-xs font-bold shadow-xs">
+        <span class="inline-block w-2 h-2 rounded-full bg-violet-600 animate-ping"></span>
+        <span>교사 수정 모드 ON</span>
+        <button id="exitTeacherModeBtn" type="button" class="ml-1 px-2 py-0.5 bg-violet-700 text-white rounded-lg hover:bg-violet-800 text-[11px] transition">
           잠금
         </button>
       </div>
 
       <!-- 효과음 토글 버튼 -->
-      <button id="soundToggleBtn" type="button" class="px-3 py-2 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition" title="효과음 켜기/끄기">
+      <button id="soundToggleBtn" type="button" class="px-2.5 py-1.5 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold flex items-center gap-1 transition" title="효과음 켜기/끄기">
         <span id="soundIcon">🔔</span>
-        <span id="soundLabel" class="hidden sm:inline">효과음 켜짐</span>
+        <span id="soundLabel" class="hidden xl:inline">효과음 켜짐</span>
       </button>
 
       <!-- 수동 입력 / 기록 수정 버튼 -->
-      <button id="openManualEditBtn" type="button" class="px-3.5 py-2 rounded-xl border-2 border-violet-200 bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+      <button id="openManualEditBtn" type="button" class="px-3 py-1.5 rounded-xl border-2 border-violet-200 bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-bold flex items-center gap-1 transition shadow-xs">
         <span>✏️</span>
         <span>수동 입력 / 기록 수정</span>
       </button>
 
       <!-- 교사 설정 버튼 -->
-      <button id="openTeacherSettingsBtn" type="button" class="px-3.5 py-2 rounded-xl border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+      <button id="openTeacherSettingsBtn" type="button" class="px-3 py-1.5 rounded-xl border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold flex items-center gap-1 transition shadow-xs">
         <span>⚙️</span>
         <span>교사 설정</span>
       </button>
 
       <!-- CSV 데이터 다운로드 버튼 -->
-      <button id="downloadCsvBtn" type="button" class="px-3.5 py-2 rounded-xl border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition shadow-sm">
+      <button id="downloadCsvBtn" type="button" class="px-3 py-1.5 rounded-xl border-2 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1 transition shadow-xs">
         <span>📥</span>
         <span>CSV 다운로드</span>
       </button>
     </div>
   </header>
 
-  <!-- 메인 좌우 2단 분할 레이아웃 -->
-  <main class="max-w-[1440px] w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+  <!-- 메인 좌우 2단 분할 레이아웃 (갤럭시 탭 S9 FE 등 태블릿 화면에서 한눈에 들어오도록 높이 고정 및 비율 최적화) -->
+  <main class="max-w-[1440px] w-full mx-auto flex-1 min-h-0 grid grid-cols-1 md:grid-cols-12 gap-3 items-stretch">
 
-    <!-- [왼쪽 영역: 등교 등록 패널] (5 칼럼) -->
-    <section class="lg:col-span-5 pastel-card p-5 sm:p-7 flex flex-col justify-between relative overflow-hidden bg-gradient-to-b from-white via-amber-50/20 to-teal-50/30">
-      <!-- 상단: 기준 등교 시간 & 캐릭터 모드 표시 -->
-      <div>
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-          <div class="inline-flex items-center gap-2 bg-amber-100/80 border-2 border-amber-200 text-amber-900 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold">
+    <!-- [왼쪽 영역: 등교 등록 패널] (5 칼럼 - 스크롤 없이 등교 확인 버튼까지 한 화면에 100% 노출) -->
+    <section class="md:col-span-5 pastel-card p-3.5 sm:p-4 lg:p-5 flex flex-col justify-between min-h-0 relative overflow-hidden bg-gradient-to-b from-white via-amber-50/20 to-teal-50/30">
+      <!-- 상단: 기준 등교 시간 & 실시간 시계 -->
+      <div class="shrink-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2.5">
+          <div class="inline-flex items-center gap-1.5 bg-amber-100/80 border-2 border-amber-200 text-amber-900 px-3 py-1 rounded-full text-xs font-bold">
             <span>⏰ 등교 기준:</span>
-            <span id="cutoffTimeDisplay" class="font-extrabold text-rose-600 text-sm sm:text-base">08:31분부터 지각</span><span id="cutoffRuleSubText" class="hidden"></span>
+            <span id="cutoffTimeDisplay" class="font-extrabold text-rose-600 text-xs sm:text-sm">08:31분부터 지각</span><span id="cutoffRuleSubText" class="hidden"></span>
           </div>
 
-          <span id="liveStatusPill" class="text-xs font-bold px-3 py-1 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
-            등교 가능 시간
+          <span id="liveStatusPill" class="text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
+            정상 등교 시간
           </span>
         </div>
 
         <!-- 실시간 시계 카드 -->
-        <div class="bg-white/95 border-2 border-slate-100 rounded-3xl p-5 sm:p-6 text-center shadow-inner mb-5">
-          <p id="currentDateText" class="font-cute text-lg sm:text-2xl text-slate-600 mb-1">
+        <div class="bg-white/95 border-2 border-slate-100 rounded-2xl p-3 sm:p-4 text-center shadow-inner">
+          <p id="currentDateText" class="font-cute text-base sm:text-xl text-slate-600">
             2026년 11월 3일 화요일
           </p>
-          <div id="currentTimeText" class="font-cute text-5xl sm:text-6xl xl:text-7xl text-slate-800 tracking-wider my-1 tabular-nums">
+          <div id="currentTimeText" class="font-cute text-4xl sm:text-5xl lg:text-6xl text-slate-800 tracking-wider my-0.5 tabular-nums leading-tight">
             08:20:00
           </div>
-          <p id="timeComparisonHint" class="text-xs sm:text-sm font-bold text-rose-500 mt-1">
+          <p id="timeComparisonHint" class="text-xs sm:text-sm font-bold text-rose-500">
             08:31분부터 지각
           </p>
         </div>
       </div>
 
-      <!-- 중앙: 오늘의 고양이 피드백 스테이지 -->
-      <div id="todayStageCard" class="my-2 rounded-3xl border-2 border-dashed border-amber-200 bg-white/80 p-5 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-300">
-        <div id="todayCatWrapper" class="w-36 h-32 sm:w-44 sm:h-36 flex items-center justify-center animate-float mb-3">
+      <!-- 중앙: 오늘의 고양이 피드백 스테이지 (남은 공간에 맞춰 유연하게 조절) -->
+      <div id="todayStageCard" class="my-2.5 flex-1 min-h-[120px] rounded-2xl border-2 border-dashed border-amber-200 bg-white/80 p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all duration-300">
+        <div id="todayCatWrapper" class="w-24 h-20 sm:w-32 sm:h-28 lg:w-36 lg:h-30 flex items-center justify-center animate-float mb-1.5">
           <!-- 고양이 캐릭터 이미지/SVG 렌더링 위치 -->
         </div>
-        <h2 id="todayFeedbackTitle" class="font-cute text-2xl sm:text-3xl text-slate-800">
+        <h2 id="todayFeedbackTitle" class="font-cute text-xl sm:text-2xl lg:text-3xl text-slate-800 leading-snug">
           좋은 아침이에요! 등교했나요?
         </h2>
-        <p id="todayFeedbackSub" class="hidden text-sm sm:text-base text-slate-600 font-medium mt-1"></p>
+        <p id="todayFeedbackSub" class="hidden text-xs sm:text-sm text-slate-600 font-medium mt-0.5"></p>
       </div>
 
-      <!-- 하단: 등교 확인 버튼 및 상태 메시지 -->
-      <div class="mt-5">
-        <button id="checkInBtn" type="button" class="btn-checkin w-full py-5 sm:py-6 px-6 rounded-3xl bg-teal-500 hover:bg-teal-400 text-white font-cute text-2xl sm:text-4xl tracking-wide flex items-center justify-center gap-3">
+      <!-- 하단: 등교 확인 버튼 및 상태 메시지 (항상 화면 하단에 고정 노출) -->
+      <div class="shrink-0">
+        <button id="checkInBtn" type="button" class="btn-checkin w-full py-3.5 sm:py-4 lg:py-5 px-5 rounded-2xl bg-teal-500 hover:bg-teal-400 text-white font-cute text-2xl sm:text-3xl tracking-wide flex items-center justify-center gap-2.5">
           <span id="checkInBtnIcon">🐾</span>
           <span id="checkInBtnText">등교 확인!</span>
         </button>
 
         <!-- 오늘 등록 완료 시 상세 안내 배너 -->
-        <div id="todayCompletedBanner" class="hidden mt-3 p-3.5 rounded-2xl border-2 text-center font-bold text-sm sm:text-base">
+        <div id="todayCompletedBanner" class="hidden mt-2 p-2 rounded-xl border-2 text-center font-bold text-xs">
         </div>
       </div>
     </section>
 
-    <!-- [오른쪽 영역: 등교 현황 대시보드] (7 칼럼) -->
-    <section class="lg:col-span-7 flex flex-col gap-5">
+    <!-- [오른쪽 영역: 등교 현황 대시보드] (7 칼럼 - 주간현황·요약 고정 + 달력 내부 스크롤 지원) -->
+    <section class="md:col-span-7 flex flex-col gap-2.5 min-h-0 overflow-hidden">
 
-      <!-- 1. 이번 주 등교 현황 (월~금 5칸 박스) -->
-      <div class="pastel-card p-5 sm:p-6 bg-white/95">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-3.5">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">📅</span>
-            <h2 class="font-cute text-xl sm:text-2xl text-slate-800">이번 주 등교 현황 (월~금)</h2>
+      <!-- 1. 이번 주 등교 현황 (월~금 5칸 박스, 고정 높이) -->
+      <div class="pastel-card p-3 sm:p-3.5 bg-white/95 shrink-0">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="text-base sm:text-lg">📅</span>
+            <h2 class="font-cute text-base sm:text-xl text-slate-800">이번 주 등교 현황 (월~금)</h2>
           </div>
-          <span id="weekRangeLabel" class="text-xs sm:text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+          <span id="weekRangeLabel" class="text-[11px] sm:text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
             2026.11.02 (월) ~ 11.06 (금)
           </span>
         </div>
 
-        <div id="weeklyBoxesContainer" class="grid grid-cols-5 gap-2.5 sm:gap-3.5">
+        <div id="weeklyBoxesContainer" class="grid grid-cols-5 gap-2">
           <!-- JS로 월~금 5칸 생성 -->
         </div>
       </div>
 
-      <!-- 2. 이번 달 기록 요약 카드 -->
-      <div class="pastel-card p-4 sm:p-5 bg-gradient-to-r from-amber-50/90 via-rose-50/70 to-teal-50/90 border-2 border-amber-200/80">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3.5">
-            <div id="monthlySummaryCatIcon" class="w-14 h-14 rounded-2xl bg-white border-2 border-amber-200 flex items-center justify-center p-1.5 shadow-sm shrink-0"></div>
+      <!-- 2. 이번 달 기록 요약 카드 (슬림 한 줄 배너) -->
+      <div class="pastel-card px-3.5 py-2.5 bg-gradient-to-r from-amber-50/90 via-rose-50/70 to-teal-50/90 border-2 border-amber-200/80 shrink-0">
+        <div class="flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5">
+            <div id="monthlySummaryCatIcon" class="w-10 h-10 rounded-xl bg-white border-2 border-amber-200 flex items-center justify-center p-1 shadow-xs shrink-0"></div>
             <div>
-              <div class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-0.5" id="summaryMonthBadge">11월 등교 리포트</div>
-              <p id="monthlySummaryText" class="text-base sm:text-xl text-slate-800 font-semibold leading-snug">
+              <div class="text-[10px] font-bold text-amber-800 uppercase tracking-wider leading-none mb-0.5" id="summaryMonthBadge">11월 등교 리포트</div>
+              <p id="monthlySummaryText" class="text-xs sm:text-base text-slate-800 font-semibold leading-tight">
                 이번 달 총 등교일 <span class="font-extrabold text-slate-900 underline decoration-amber-400 decoration-2">0일</span> 중
-                <strong class="text-teal-700 bg-teal-100/90 px-2 py-0.5 rounded-lg">정상 등교 0번</strong>,
-                <strong class="text-rose-600 bg-rose-100/90 px-2 py-0.5 rounded-lg">지각 0번</strong>!
+                <strong class="text-teal-700 bg-teal-100/90 px-1.5 py-0.5 rounded-md">정상 등교 0번</strong>,
+                <strong class="text-rose-600 bg-rose-100/90 px-1.5 py-0.5 rounded-md">지각 0번</strong>!
               </p>
             </div>
           </div>
 
           <!-- 정상 등교 비율 미니 게이지 -->
-          <div class="w-full sm:w-44 bg-white/90 rounded-2xl p-3 border border-amber-200/80 shrink-0">
-            <div class="flex justify-between text-xs font-bold mb-1">
-              <span class="text-slate-600">정상 등교 달성률</span>
+          <div class="w-36 sm:w-40 bg-white/90 rounded-xl px-2.5 py-1.5 border border-amber-200/80 shrink-0">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span class="text-slate-600">정상 등교율</span>
               <span id="onTimeRateText" class="text-teal-700">0%</span>
             </div>
-            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
               <div id="onTimeProgressBar" class="h-full bg-teal-500 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 3. 이번 달 달력 (월간 뷰) -->
-      <div class="pastel-card p-5 sm:p-6 flex-1 flex flex-col justify-between bg-white/95">
-        <div>
-          <!-- 달력 상단 컨트롤 -->
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">🗓️</span>
-              <h2 id="calendarTitle" class="font-cute text-xl sm:text-2xl text-slate-800">2026년 11월 달력</h2>
-              <button id="goTodayMonthBtn" type="button" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+      <!-- 3. 이번 달 달력 (월간 뷰 - 남은 높이에 맞추고 필요 시 달력 내부만 부드럽게 스크롤) -->
+      <div class="pastel-card p-3 sm:p-3.5 flex-1 min-h-0 flex flex-col justify-between bg-white/95 overflow-hidden">
+        <!-- 달력 상단 컨트롤 (고정) -->
+        <div class="shrink-0">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-1.5">
+              <span class="text-base sm:text-lg">🗓️</span>
+              <h2 id="calendarTitle" class="font-cute text-base sm:text-xl text-slate-800">2026년 11월 달력</h2>
+              <button id="goTodayMonthBtn" type="button" class="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
                 이번 달로
               </button>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
               <!-- 스탬프 범례 -->
-              <div class="hidden sm:flex items-center gap-3 text-xs font-semibold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-teal-500 inline-block"></span>정상 등교(웃는 냥이)</span>
-                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>지각(우는 냥이)</span>
+              <div class="hidden lg:flex items-center gap-2.5 text-[11px] font-semibold text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-teal-500 inline-block"></span>정상(웃는 냥이)</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>지각(우는 냥이)</span>
               </div>
 
               <!-- 이전/다음 달 버튼 -->
               <div class="flex items-center gap-1">
-                <button id="prevMonthBtn" type="button" class="w-9 h-9 rounded-xl border-2 border-slate-200 hover:bg-slate-100 flex items-center justify-center font-bold text-slate-600 transition" title="이전 달">
+                <button id="prevMonthBtn" type="button" class="w-7 h-7 rounded-lg border-2 border-slate-200 hover:bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-600 transition" title="이전 달">
                   ◀
                 </button>
-                <button id="nextMonthBtn" type="button" class="w-9 h-9 rounded-xl border-2 border-slate-200 hover:bg-slate-100 flex items-center justify-center font-bold text-slate-600 transition" title="다음 달">
+                <button id="nextMonthBtn" type="button" class="w-7 h-7 rounded-lg border-2 border-slate-200 hover:bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-600 transition" title="다음 달">
                   ▶
                 </button>
               </div>
@@ -284,25 +281,27 @@
           </div>
 
           <!-- 요일 헤더 (일~토) -->
-          <div class="grid grid-cols-7 gap-1.5 sm:gap-2 text-center text-xs sm:text-sm font-extrabold mb-2">
-            <div class="py-1.5 rounded-lg bg-rose-50 text-rose-500">일</div>
-            <div class="py-1.5 rounded-lg bg-slate-100 text-slate-700">월</div>
-            <div class="py-1.5 rounded-lg bg-slate-100 text-slate-700">화</div>
-            <div class="py-1.5 rounded-lg bg-slate-100 text-slate-700">수</div>
-            <div class="py-1.5 rounded-lg bg-slate-100 text-slate-700">목</div>
-            <div class="py-1.5 rounded-lg bg-slate-100 text-slate-700">금</div>
-            <div class="py-1.5 rounded-lg bg-blue-50 text-blue-500">토</div>
+          <div class="grid grid-cols-7 gap-1 sm:gap-1.5 text-center text-[11px] sm:text-xs font-extrabold mb-1.5">
+            <div class="py-1 rounded-md bg-rose-50 text-rose-500">일</div>
+            <div class="py-1 rounded-md bg-slate-100 text-slate-700">월</div>
+            <div class="py-1 rounded-md bg-slate-100 text-slate-700">화</div>
+            <div class="py-1 rounded-md bg-slate-100 text-slate-700">수</div>
+            <div class="py-1 rounded-md bg-slate-100 text-slate-700">목</div>
+            <div class="py-1 rounded-md bg-slate-100 text-slate-700">금</div>
+            <div class="py-1 rounded-md bg-blue-50 text-blue-500">토</div>
           </div>
+        </div>
 
-          <!-- 달력 날짜 그리드 -->
-          <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+        <!-- 달력 날짜 그리드 (달력 내부만 필요 시 스크롤 가능) -->
+        <div class="flex-1 min-h-0 overflow-y-auto pr-0.5">
+          <div id="calendarGrid" class="grid grid-cols-7 gap-1 sm:gap-1.5">
             <!-- JS로 렌더링 -->
           </div>
         </div>
 
         <!-- 달력 하단 도움말 -->
-        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-          <span id="calendarFooterHint">💡 선생님은 상단의 <strong>[수동 입력 / 기록 수정]</strong> 버튼을 눌러 날짜별 등교 상태를 수정할 수 있습니다.</span>
+        <div class="mt-2 pt-1.5 border-t border-slate-100 shrink-0 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+          <span id="calendarFooterHint">💡 선생님은 상단의 <strong>[수동 입력 / 수정]</strong> 버튼을 눌러 날짜별 등교 상태를 수정할 수 있습니다.</span>
           <span id="totalStoredCountText" class="font-semibold text-slate-600">전체 누적 기록: 0건</span>
         </div>
       </div>
@@ -814,15 +813,15 @@
 
       if (!todayRecord) {
         // 미등록 상태
-        stageCard.className = 'my-2 rounded-3xl border-2 border-dashed border-amber-200 bg-white/85 p-5 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-300';
+        stageCard.className = 'my-2.5 flex-1 min-h-[110px] rounded-2xl border-2 border-dashed border-amber-200 bg-white/85 p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all duration-300';
         catWrapper.innerHTML = getCatCharacterHtml('normal');
         titleEl.textContent = '좋은 아침이에요! 등교했나요?';
-        titleEl.className = 'font-cute text-2xl sm:text-3xl text-slate-800';
+        titleEl.className = 'font-cute text-xl sm:text-2xl lg:text-3xl text-slate-800 leading-snug';
         subEl.textContent = '';
         subEl.classList.add('hidden');
 
         checkInBtn.disabled = false;
-        checkInBtn.className = 'btn-checkin w-full py-5 sm:py-6 px-6 rounded-3xl bg-teal-500 hover:bg-teal-400 text-white font-cute text-2xl sm:text-4xl tracking-wide flex items-center justify-center gap-3';
+        checkInBtn.className = 'btn-checkin w-full py-3.5 sm:py-4 lg:py-5 px-5 rounded-2xl bg-teal-500 hover:bg-teal-400 text-white font-cute text-2xl sm:text-3xl tracking-wide flex items-center justify-center gap-2.5';
         checkInBtnIcon.textContent = '🐾';
         checkInBtnText.textContent = '등교 확인!';
 
@@ -832,32 +831,32 @@
         const statusLabel = isNormal ? '정상 등교' : '지각';
 
         if (isNormal) {
-          stageCard.className = 'my-2 rounded-3xl border-3 border-teal-300 bg-teal-50/70 p-5 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-300 shadow-inner';
+          stageCard.className = 'my-2.5 flex-1 min-h-[110px] rounded-2xl border-3 border-teal-300 bg-teal-50/70 p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all duration-300 shadow-inner';
           catWrapper.innerHTML = getCatCharacterHtml('normal');
           titleEl.textContent = '참 잘했어요! 오늘 정상 등교 성공!';
-          titleEl.className = 'font-cute text-2xl sm:text-3xl text-teal-800';
+          titleEl.className = 'font-cute text-xl sm:text-2xl lg:text-3xl text-teal-800 leading-snug';
           subEl.textContent = '';
           subEl.classList.add('hidden');
         } else {
-          stageCard.className = 'my-2 rounded-3xl border-3 border-rose-300 bg-rose-50/70 p-5 sm:p-6 flex flex-col items-center justify-center text-center transition-all duration-300 shadow-inner';
+          stageCard.className = 'my-2.5 flex-1 min-h-[110px] rounded-2xl border-3 border-rose-300 bg-rose-50/70 p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all duration-300 shadow-inner';
           catWrapper.innerHTML = getCatCharacterHtml('late');
           titleEl.textContent = '아쉬워요! 오늘은 조금 늦었어요';
-          titleEl.className = 'font-cute text-2xl sm:text-3xl text-rose-800';
+          titleEl.className = 'font-cute text-xl sm:text-2xl lg:text-3xl text-rose-800 leading-snug';
           subEl.textContent = '';
           subEl.classList.add('hidden');
         }
 
         // 버튼 비활성화 및 완료 문구 표시
         checkInBtn.disabled = true;
-        checkInBtn.className = 'btn-checkin w-full py-4 sm:py-5 px-5 rounded-3xl bg-slate-200 text-slate-500 font-cute text-xl sm:text-2xl tracking-wide flex items-center justify-center gap-2';
+        checkInBtn.className = 'btn-checkin w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-slate-200 text-slate-500 font-cute text-lg sm:text-2xl tracking-wide flex items-center justify-center gap-2';
         checkInBtnIcon.textContent = isNormal ? '✅' : '⏰';
         checkInBtnText.textContent = `오늘 등교 완료! (${todayRecord.time} - ${statusLabel})`;
 
         completedBanner.classList.remove('hidden');
         completedBanner.className = isNormal
-          ? 'mt-3 p-3 rounded-2xl border-2 border-teal-200 bg-teal-50 text-teal-800 text-center font-bold text-xs sm:text-sm'
-          : 'mt-3 p-3 rounded-2xl border-2 border-rose-200 bg-rose-50 text-rose-700 text-center font-bold text-xs sm:text-sm';
-        completedBanner.textContent = `📌 오늘(${todayKey}) 기록이 저장되었습니다. [${todayRecord.time} · ${statusLabel} · ${todayRecord.note}]`;
+          ? 'mt-2 p-2 rounded-xl border-2 border-teal-200 bg-teal-50 text-teal-800 text-center font-bold text-xs'
+          : 'mt-2 p-2 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-700 text-center font-bold text-xs';
+        completedBanner.textContent = `📌 오늘(${todayKey}) 기록 저장됨 [${todayRecord.time} · ${statusLabel} · ${todayRecord.note}]`;
       }
     }
 
@@ -890,10 +889,10 @@
         }
 
         const editableClass = state.teacherAuthenticated ? 'teacher-editable' : '';
-        card.className = `rounded-2xl border-2 ${bgClass} ${editableClass} p-2.5 sm:p-3.5 flex flex-col items-center justify-between min-h-[148px] sm:min-h-[168px] transition-all relative`;
+        card.className = `rounded-xl border-2 ${bgClass} ${editableClass} p-2 flex flex-col items-center justify-between min-h-[104px] sm:min-h-[114px] transition-all relative`;
 
         const todayBadge = isToday
-          ? `<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-400 text-amber-950">오늘</span>`
+          ? `<span class="text-[9px] font-extrabold px-1 py-0.5 rounded bg-amber-400 text-amber-950">오늘</span>`
           : '';
 
         let centerContent = '';
@@ -902,16 +901,16 @@
         if (rec) {
           const isNormal = rec.status === 'normal';
           centerContent = `
-            <div class="w-16 h-14 sm:w-20 sm:h-16 flex items-center justify-center my-1 animate-stamp">
+            <div class="w-11 h-10 sm:w-14 sm:h-11 flex items-center justify-center my-0.5 animate-stamp">
               ${getCatCharacterHtml(rec.status)}
             </div>
           `;
           bottomContent = `
             <div class="text-center w-full">
-              <div class="font-cute text-base sm:text-xl ${isNormal ? 'text-teal-800' : 'text-rose-700'} leading-none mb-1">
+              <div class="font-cute text-xs sm:text-base ${isNormal ? 'text-teal-800' : 'text-rose-700'} leading-none mb-0.5">
                 ${rec.time}
               </div>
-              <span class="inline-block text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
+              <span class="inline-block text-[10px] font-extrabold px-1.5 py-0.2 rounded-full ${
                 isNormal ? 'bg-teal-200/80 text-teal-900' : 'bg-rose-200/80 text-rose-900'
               }">
                 ${isNormal ? '정상 등교' : '지각'}
@@ -920,13 +919,13 @@
           `;
         } else {
           centerContent = `
-            <div class="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-300 text-2xl my-1">
+            <div class="w-10 h-10 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-300 text-lg my-0.5">
               🐾
             </div>
           `;
           bottomContent = `
             <div class="text-center">
-              <span class="text-xs font-bold text-slate-400">${isToday ? '등교 대기 중' : '미등록'}</span>
+              <span class="text-[11px] font-bold text-slate-400">${isToday ? '등교 대기' : '미등록'}</span>
             </div>
           `;
         }
@@ -992,7 +991,7 @@
       // 앞쪽 빈 칸
       for (let i = 0; i < firstDayOfWeek; i++) {
         const emptyCell = document.createElement('div');
-        emptyCell.className = 'min-h-[68px] sm:min-h-[82px] rounded-xl bg-slate-50/40 border border-transparent';
+        emptyCell.className = 'min-h-[50px] sm:min-h-[56px] rounded-lg bg-slate-50/40 border border-transparent';
         grid.appendChild(emptyCell);
       }
 
@@ -1010,11 +1009,11 @@
             ? 'bg-teal-50/75 border-teal-300'
             : 'bg-rose-50/75 border-rose-300';
         } else if (isToday) {
-          cellStyle = 'bg-amber-50/90 border-amber-400 ring-2 ring-amber-200';
+          cellStyle = 'bg-amber-50/90 border-amber-400 ring-1 ring-amber-300';
         }
 
         const editableClass = state.teacherAuthenticated ? 'teacher-editable' : 'cursor-pointer';
-        cell.className = `min-h-[68px] sm:min-h-[82px] rounded-xl border-2 p-1.5 sm:p-2 flex flex-col justify-between transition ${cellStyle} ${editableClass}`;
+        cell.className = `min-h-[50px] sm:min-h-[56px] rounded-lg border-2 p-1 sm:p-1.5 flex flex-col justify-between transition ${cellStyle} ${editableClass}`;
 
         const dayColor =
           dayOfWeek === 0 ? 'text-rose-500' : dayOfWeek === 6 ? 'text-blue-500' : 'text-slate-700';
@@ -1024,10 +1023,10 @@
           const isNormal = rec.status === 'normal';
           stampHtml = `
             <div class="flex flex-col items-center justify-center -mt-1">
-              <div class="w-9 h-8 sm:w-11 sm:h-9 flex items-center justify-center animate-stamp">
+              <div class="w-7 h-6 sm:w-8 sm:h-7 flex items-center justify-center animate-stamp">
                 ${getCatCharacterHtml(rec.status)}
               </div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold leading-tight ${
+              <span class="text-[9px] sm:text-[10px] font-extrabold leading-none ${
                 isNormal ? 'text-teal-800' : 'text-rose-700'
               }">${rec.time}</span>
             </div>
